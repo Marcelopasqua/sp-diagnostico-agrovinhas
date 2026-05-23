@@ -1040,41 +1040,61 @@ async function submitForm() {
   // Guardar para copy
   window._resultData = data;
 
+  // Montar resumo formatado para o email
+  function linha(label, valor) {
+    if (!valor || valor === '—' || valor === '') return '';
+    return `› ${label}: ${valor}\n`;
+  }
+
+  let resumo = '';
+  resumo += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  resumo += 'S&P AgroGestão · Diagnóstico Pré-Visita\n';
+  resumo += 'Cliente: Jober & Lisiane Vinhas · 2.000 ha\n';
+  resumo += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+  resumo += '01 · FINANCEIRO E RESULTADO\n';
+  resumo += linha('Documentos disponíveis', data.financeiro.documentos.join(', '));
+  resumo += linha('Financiamentos ativos', data.financeiro.financiamentos.join(', '));
+  resumo += linha('Controle de despesas fixas', data.financeiro.controle);
+  resumo += linha('Obs. documentos', data.financeiro.obsDocumentos);
+  resumo += linha('Obs. financiamentos', data.financeiro.obsFinanciamentos);
+
+  resumo += '\n02 · OPERACIONAL E PRODUÇÃO\n';
+  resumo += linha('Composição da área', data.operacional.area);
+  resumo += linha('Detalhe de área', data.operacional.detalheArea);
+  resumo += linha('Documentos disponíveis', data.operacional.documentos.join(', '));
+  resumo += linha('Equipamentos', data.operacional.equipamentos.join(', '));
+  resumo += linha('Armazenagem', data.operacional.armazenagem.join(', '));
+  resumo += linha('Obs. equipamentos', data.operacional.obsEquipamentos);
+
+  resumo += '\n03 · GESTÃO, PESSOAS E PROCESSOS\n';
+  resumo += linha('Equipe', data.gestao.equipe.join(', '));
+  resumo += linha('Número de pessoas', data.gestao.numFuncionarios);
+  resumo += linha('Tomada de decisão', data.gestao.decisao.join(', '));
+  resumo += linha('Gargalos apontados', data.gestao.gargalos.join(', '));
+  resumo += linha('Preocupação principal', data.gestao.obsGargalos);
+
+  resumo += '\n04 · DADOS, TECNOLOGIA E SISTEMAS\n';
+  resumo += linha('Sistemas usados', data.dados.sistemas.join(', '));
+  resumo += linha('Outro sistema', data.dados.outroSistema);
+  resumo += linha('Quem acessa dados financeiros', data.dados.acesso.join(', '));
+  resumo += linha('Frequência de revisão', data.dados.frequencia);
+
+  resumo += '\n05 · GOVERNANÇA, FAMÍLIA E VISÃO DE FUTURO\n';
+  resumo += linha('Lisiane — envolvimento', data.governanca.lisiane.join(', '));
+  resumo += linha('Vitor e Júlia', data.governanca.filhos.join(', '));
+  resumo += linha('Visão de futuro', data.governanca.visao.join(', '));
+  resumo += linha('O que quer mudar', data.governanca.obsVisao);
+  resumo += linha('Sócios/parceiros', data.governanca.socios);
+  resumo += linha('Detalhe parceria', data.governanca.obsSocios);
+
+  resumo += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  resumo += 'Diagnóstico S&P AgroGestão · Confidencial\n';
+
   // Montar payload para Formspree
   const payload = new FormData();
   payload.append('_subject', 'S&P AgroGestão · Diagnóstico Pré-Visita · Agro Vinhas');
-  payload.append('Cliente', 'Jober & Lisiane Vinhas · 2.000 ha');
-
-  payload.append('01_Financeiro_Documentos', data.financeiro.documentos.join(', ') || '—');
-  payload.append('01_Financeiro_Financiamentos', data.financeiro.financiamentos.join(', ') || '—');
-  payload.append('01_Financeiro_Controle_Despesas', data.financeiro.controle);
-  payload.append('01_Financeiro_Obs_Documentos', data.financeiro.obsDocumentos || '—');
-  payload.append('01_Financeiro_Obs_Financiamentos', data.financeiro.obsFinanciamentos || '—');
-
-  payload.append('02_Operacional_Composicao_Area', data.operacional.area);
-  payload.append('02_Operacional_Detalhe_Area', data.operacional.detalheArea || '—');
-  payload.append('02_Operacional_Documentos', data.operacional.documentos.join(', ') || '—');
-  payload.append('02_Operacional_Equipamentos', data.operacional.equipamentos.join(', ') || '—');
-  payload.append('02_Operacional_Armazenagem', data.operacional.armazenagem.join(', ') || '—');
-  payload.append('02_Operacional_Obs_Equipamentos', data.operacional.obsEquipamentos || '—');
-
-  payload.append('03_Gestao_Equipe', data.gestao.equipe.join(', ') || '—');
-  payload.append('03_Gestao_Num_Funcionarios', data.gestao.numFuncionarios || '—');
-  payload.append('03_Gestao_Decisao', data.gestao.decisao.join(', ') || '—');
-  payload.append('03_Gestao_Gargalos', data.gestao.gargalos.join(', ') || '—');
-  payload.append('03_Gestao_Preocupacao_Principal', data.gestao.obsGargalos || '—');
-
-  payload.append('04_Dados_Sistemas', data.dados.sistemas.join(', ') || '—');
-  payload.append('04_Dados_Outro_Sistema', data.dados.outroSistema || '—');
-  payload.append('04_Dados_Acesso_Financeiro', data.dados.acesso.join(', ') || '—');
-  payload.append('04_Dados_Frequencia_Revisao', data.dados.frequencia);
-
-  payload.append('05_Gov_Lisiane', data.governanca.lisiane.join(', ') || '—');
-  payload.append('05_Gov_Filhos', data.governanca.filhos.join(', ') || '—');
-  payload.append('05_Gov_Visao_Futuro', data.governanca.visao.join(', ') || '—');
-  payload.append('05_Gov_O_Que_Quer_Mudar', data.governanca.obsVisao || '—');
-  payload.append('05_Gov_Socios', data.governanca.socios);
-  payload.append('05_Gov_Detalhe_Socios', data.governanca.obsSocios || '—');
+  payload.append('Resumo_Diagnostico', resumo);
 
   // Enviar para Formspree
   try {

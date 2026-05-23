@@ -1094,6 +1094,7 @@ async function submitForm() {
   // Montar payload para Formspree
   const payload = new FormData();
   payload.append('_subject', 'S&P AgroGestão · Diagnóstico Pré-Visita · Agro Vinhas');
+  payload.append('_source', 'marcelopasqua.github.io/sp-diagnostico-agrovinhas');
   payload.append('Resumo_Diagnostico', resumo);
 
   // Enviar para Formspree
